@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Self-Checkout</title>
+<style>
+  :root{
+    --bg:#dfe3e6; --edge:#c3c8cc; --bezel:#15181b;
+    --screen:#ffffff; --ink:#1f2933; --muted:#66707a; --brand:#1f7a4d; --brandDark:#17603c;
+    --sign:#f5a623; --signInk:#2b1b00; --ok:#1f7a4d; --err:#b3261e; --line:#e1e4e8;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:linear-gradient(#e8ebed,#d3d8db);color:var(--ink);
+       font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+       min-height:100vh;display:flex;justify-content:center;padding:14px 12px 30px}
+  .kiosk{width:100%;max-width:440px;display:flex;flex-direction:column;align-items:center}
+
+  /* 廣告牌:貼在機台最上方,不遮擋螢幕 */
+  .sign{width:92%;background:var(--sign);color:var(--signInk);border-radius:12px 12px 4px 4px;padding:10px 14px 11px;
+        text-align:center;border:2px solid #d98e0f;font-weight:600;line-height:1.35;font-size:clamp(14px,3.5vw,17px);
+        box-shadow:0 3px 6px rgba(0,0,0,.18);position:relative;z-index:2}
+  .sign .tag{display:block;font-size:.78em;letter-spacing:.1em;text-transform:uppercase;opacity:.8}
+  .sign b{font-weight:800}
+  .sign .code{background:#fff;border-radius:4px;padding:0 6px;font-weight:800;letter-spacing:.04em;white-space:nowrap}
+
+  /* 機台本體 */
+  .cabinet{width:100%;margin-top:-4px;background:linear-gradient(90deg,#e4e7ea 0%,#fbfbfa 12%,#fbfbfa 88%,#e4e7ea 100%);
+           border:2px solid var(--edge);border-radius:26px 26px 14px 14px;padding:26px 16px 0;
+           box-shadow:0 10px 24px rgba(0,0,0,.18), inset 0 2px 0 #fff;position:relative}
+  .bezel{background:var(--bezel);border-radius:16px;padding:13px 13px 16px;box-shadow:inset 0 0 0 2px #2b3035, 0 2px 4px rgba(0,0,0,.3)}
+  .screen{background:var(--screen);border-radius:6px;min-height:500px;display:flex;flex-direction:column;overflow:hidden;position:relative}
+  .camera{width:8px;height:8px;border-radius:50%;background:#34393e;margin:0 auto 7px;box-shadow:0 0 0 2px #22262a}
+
+  .topbar{background:var(--brand);color:#fff;padding:10px 14px;font-weight:700;display:flex;justify-content:space-between;align-items:center;font-size:15px}
+  .topbar small{font-weight:500;opacity:.9}
+  .content{padding:14px 16px 16px;flex:1;display:flex;flex-direction:column;min-height:0}
+  h1{font-size:19px;margin:0 0 3px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 10px}
+  .list{flex:1;overflow-y:auto;max-height:290px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:8px}
+  table{width:100%;border-collapse:collapse;font-size:14.5px}
+  td{padding:6px 0;border-bottom:1px solid var(--line)}
+  .list tr:last-child td{border-bottom:0}
+  td.p{text-align:right;white-space:nowrap;padding-left:10px}
+  td.ic{width:44px;padding:6px 8px 6px 0}
+  td.ic svg{width:32px;height:32px;display:block}
+  .list tr td{padding-top:9px;padding-bottom:9px}
+  .sum td{border:0;padding:3px 0}
+  .sum .total td{font-weight:800;font-size:18px;border-top:2px solid var(--ink);padding-top:7px}
+  .sum .disc td{color:var(--ok);font-weight:600}
+  .status{background:#e8f5ee;color:var(--ok);border:1px solid #b9dfc9;border-radius:8px;padding:9px 12px;font-weight:600;margin:0 0 12px;font-size:15px}
+  .spacer{flex:1}
+  button.main{width:100%;border:0;border-radius:10px;background:var(--brand);color:#fff;font-size:18px;font-weight:700;padding:15px;cursor:pointer;margin-top:12px}
+  button.main:hover{background:var(--brandDark)}
+  button.main:disabled{background:#b6bcc1;cursor:not-allowed}
+  .opt{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-radius:10px;padding:12px 14px;margin:8px 0;font-size:17px;cursor:pointer}
+  .opt input{width:20px;height:20px;accent-color:var(--brand)}
+  .opt.sel{border-color:var(--brand);background:#f0f8f3}
+  .ask{font-size:18px;line-height:1.45;margin:6px 0 18px}
+  .qty{color:var(--muted);font-weight:600;margin-left:4px}
+  .list{max-height:none}
+  /* 第 2 頁:訂單摘要的視覺層級 */
+  .status{font-size:17px;font-weight:700;padding:12px 14px;margin:2px 0 18px}
+  .status::before{content:"\2713\00a0"}
+  .orderbox{border:2px solid var(--line);border-radius:12px;padding:6px 16px}
+  .orderbox .row{display:flex;justify-content:space-between;align-items:baseline;padding:11px 0}
+  .orderbox .muted{color:var(--muted);font-size:15px}
+  .orderbox .disc{color:var(--ok);font-size:15px;font-weight:400;border-top:1px solid var(--line)}
+  .orderbox .disc em{font-style:normal;font-size:12px;font-weight:400;background:#e8f5ee;border-radius:5px;padding:2px 6px;margin-left:6px}
+  .orderbox .grand{border-top:2px solid var(--ink);padding:14px 0 10px}
+  .orderbox .grand span:first-child{font-size:17px;font-weight:700}
+  .orderbox .grand .amt{font-size:24px;font-weight:800}
+  .back{width:100%;margin-top:22px}
+  .hint{color:var(--muted);font-size:14px;margin-top:12px}
+  /* 第 3 頁:捐贈選項(金額方塊 + 獨立的 No, thank you) */
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .tile{border:2px solid #b8bec4;background:#f4f6f8;border-radius:12px;padding:22px 0;font-size:24px;font-weight:800;color:var(--ink);cursor:pointer}
+  .tile:hover{border-color:var(--brand)}
+  .tile.sel,.nothanks.sel{border-color:var(--brand);background:#e8f5ee;color:var(--brandDark)}
+  .nothanks{width:100%;margin-top:14px;border:2px solid #b8bec4;background:#fff;border-radius:999px;padding:13px;font-size:16px;font-weight:700;color:var(--ink);cursor:pointer}
+  .nothanks:hover{border-color:var(--brand)}
+  .overlay{position:absolute;inset:0;background:rgba(20,24,28,.55);display:flex;align-items:center;justify-content:center;padding:18px;z-index:5}
+  .modal{background:#fff;border-radius:12px;padding:20px;width:100%;max-width:340px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .modal h2{margin:0 0 6px;font-size:19px}
+  .modal input{width:100%;font-size:20px;padding:12px;border:2px solid #b8bec4;border-radius:8px;letter-spacing:.05em;text-transform:uppercase}
+  .modal input:focus{outline:none;border-color:var(--brand)}
+  .err{color:var(--err);font-size:14px;min-height:20px;margin:6px 0 0}
+  .hidden{display:none!important}
+  .done{text-align:center;padding:50px 10px}
+  .done h1{color:var(--ok)}
+
+  /* 螢幕下方:掃描器 / 刷卡機 / 收據出口 */
+  .deck{display:flex;gap:10px;align-items:stretch;margin:16px 0 14px}
+  .unit{flex:1;background:linear-gradient(#eceff1,#d7dcdf);border:1px solid #bcc2c6;border-radius:10px;
+        padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+        box-shadow:inset 0 1px 0 #fff;min-height:96px}
+  .unit .lbl{font-size:11px;color:#5b646c;letter-spacing:.06em;text-transform:uppercase;margin-top:6px}
+  .scan-win{width:100%;height:46px;background:linear-gradient(#202428,#0f1214);border-radius:6px;position:relative;border:2px solid #9aa1a6}
+  .scan-win::after{content:"";position:absolute;left:8%;right:8%;top:50%;height:2px;background:#ff3b30;box-shadow:0 0 8px #ff3b30}
+  .pos{width:100%;background:#2d3338;border-radius:8px;padding:6px;transform:perspective(200px) rotateX(18deg);transform-origin:bottom}
+  .pos .d{height:16px;background:#8fd0a8;border-radius:3px;margin-bottom:5px}
+  .pos .k{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+  .pos .k i{height:7px;background:#6b737a;border-radius:2px}
+  .slot{width:78%;height:10px;background:#101315;border-radius:5px;margin-top:10px;position:relative}
+  .slot::after{content:"";position:absolute;left:12%;right:12%;top:8px;height:30px;background:#fff;border:1px solid #c9cdd1;border-top:0}
+  .stand{width:34%;height:46px;background:linear-gradient(90deg,#c9ced2,#f1f3f4 50%,#c9ced2);border-left:2px solid var(--edge);border-right:2px solid var(--edge)}
+  .base{width:62%;height:16px;background:linear-gradient(#cfd4d8,#aeb4b9);border-radius:6px 6px 12px 12px;box-shadow:0 8px 12px rgba(0,0,0,.2)}
+</style>
+</head>
+<body>
+<div class="kiosk">
+  <div class="sign" id="sign"></div>
+  <div class="cabinet">
+    <div class="bezel">
+      <div class="camera"></div>
+      <div class="screen" id="screen">
+        <div class="topbar"><span>FreshMart Self-Checkout</span><small id="stepLabel"></small></div>
+
+        <!-- 第 1 頁:掃描完成 -->
+        <div class="content" id="p1">
+          <h1>Scanning complete</h1>
+          <p class="sub"><span id="count"></span> items scanned. Please review your items.</p>
+          <div class="list"><table id="items"></table></div>
+          <table class="sum"><tr class="total"><td>Subtotal</td><td class="p" id="sub1"></td></tr></table>
+          <button class="main" id="to2">Proceed to checkout</button>
+        </div>
+
+        <!-- 第 2 頁:優惠 -->
+        <div class="content hidden" id="p2">
+          <div class="status hidden" id="status"></div>
+          <div class="orderbox">
+            <div class="row muted"><span>Subtotal</span><span id="sub2"></span></div>
+            <div class="row disc"><span>Discount <em>20% OFF</em></span><span id="discAmt"></span></div>
+            <div class="row grand"><span>Total to pay</span><span class="amt" id="total2"></span></div>
+          </div>
+          <div class="spacer"></div>
+          <button class="main" id="to3">Continue to payment</button>
+          <div class="overlay hidden" id="promoBox">
+            <div class="modal">
+              <h2>Promo code</h2>
+              <p class="sub" style="margin-bottom:10px">Enter your promo code.</p>
+              <input id="codeInput" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Promo code">
+              <div class="err" id="codeErr"></div>
+              <button class="main" id="apply" style="margin-top:8px">Apply</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 第 3 頁:捐贈 -->
+        <div class="content hidden" id="p3">
+          <p class="ask">Would you like to add a donation to <b>Community Food Bank</b> to help provide meals to families in need?</p>
+          <div class="tiles" id="tiles"></div>
+          <button type="button" class="nothanks" id="nothanks">No, thank you</button>
+          <div class="spacer"></div>
+          <table class="sum"><tr class="total"><td>Order total</td><td class="p" id="finalTotal"></td></tr></table>
+          <button class="main" id="pay" disabled>Complete payment</button>
+        </div>
+
+        <!-- 結束 -->
+        <div class="content hidden" id="p4">
+          <div class="done">
+            <h1>Thank you. Your checkout is complete.</h1>
+            <p>Please return to the survey to continue.</p>
+            <button class="main back" id="back">Return to the survey</button>
+            <p class="hint hidden" id="hint">If this page does not close, please close this tab manually and return to the survey window.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:22px"></div>
+  </div>
+  <div class="stand"></div>
+  <div class="base"></div>
+</div>
+
+<script>
+(function(){
+  // ?v=a 手動輸入組;?v=b 自動套用組(網址不暴露條件名稱)
+  var q = new URLSearchParams(location.search);
+  var v = (q.get('v') || '').toLowerCase();
+  var manual = false;  // 自動套用組(本檔固定)
+  var CODE = 'FRESH20';
+
+  // 價格一律以「分」計算,避免浮點誤差
+  // 簡單 SVG 圖示(全平台一致)
+  var ICON = {
+    steak:'<svg viewBox="0 0 32 32"><path d="M5 17c0-7 6-12 14-11 6 1 9 6 8 12-1 6-7 9-13 8-6-1-9-3-9-9z" fill="#b5483a"/><path d="M10 17c0-4 4-7 9-6 4 1 6 4 5 8-1 4-5 6-9 5-4-1-5-3-5-7z" fill="#d97b6c"/><circle cx="18" cy="17" r="3" fill="#fff"/></svg>',
+    fish:'<svg viewBox="0 0 32 32"><path d="M3 16c4-7 13-9 19-4l7-4v16l-7-4c-6 5-15 3-19-4z" fill="#ef8a6b"/><path d="M9 16c3-3 8-3 11 0-3 3-8 3-11 0z" fill="#f7b49f"/><circle cx="8" cy="15" r="1.4" fill="#222"/></svg>',
+    chicken:'<svg viewBox="0 0 32 32"><path d="M14 4c6-1 12 4 11 10-1 5-6 8-10 7l-4 5c-1 1-3 1-3-1l1-5c-3-3-3-9 1-12 1-2 3-3 4-4z" fill="#d9913b"/><circle cx="8" cy="25" r="2.2" fill="#fff"/><circle cx="11" cy="27" r="2.2" fill="#fff"/></svg>',
+    rice:'<svg viewBox="0 0 32 32"><path d="M8 5h16l2 22H6z" fill="#f2efe6" stroke="#b9b29a" stroke-width="1.5"/><rect x="10" y="12" width="12" height="9" rx="2" fill="#1f7a4d"/></svg>',
+    oil:'<svg viewBox="0 0 32 32"><rect x="13" y="3" width="6" height="7" rx="1.5" fill="#444"/><path d="M12 10h8l3 6v12a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2V16z" fill="#8a9a2b"/><rect x="11" y="17" width="10" height="7" rx="1.5" fill="#fff" opacity=".85"/></svg>',
+    eggs:'<svg viewBox="0 0 32 32"><rect x="3" y="12" width="26" height="14" rx="3" fill="#cfc7b6"/><ellipse cx="9" cy="14" rx="4" ry="5" fill="#fffaf0"/><ellipse cx="16" cy="14" rx="4" ry="5" fill="#fffaf0"/><ellipse cx="23" cy="14" rx="4" ry="5" fill="#fffaf0"/></svg>',
+    asparagus:'<svg viewBox="0 0 32 32"><g stroke="#3f8f3a" stroke-width="3.2" stroke-linecap="round"><path d="M9 28L12 8"/><path d="M16 28V6"/><path d="M23 28L20 8"/></g><g fill="#2c6e2a"><ellipse cx="12" cy="7" rx="2.2" ry="4"/><ellipse cx="16" cy="5" rx="2.2" ry="4"/><ellipse cx="20" cy="7" rx="2.2" ry="4"/></g></svg>'
+  };
+
+  // [圖示, 名稱, 數量, 單價(分)]
+  var items = [
+    ['steak','Ribeye steaks, 2-pack',1,1847],
+    ['fish','Atlantic salmon fillet, 1 lb',1,1349],
+    ['chicken','Chicken breast, 2.2 lb',1,1043],
+    ['rice','Jasmine rice, 5 lb',1,749],
+    ['oil','Extra virgin olive oil, 17 oz',1,879],
+    ['eggs','Eggs, 12 ct',2,389]
+  ];
+  var SUB = items.reduce(function(s,it){ return s + it[2]*it[3]; }, 0);  // 6645
+  var DISC = Math.round(SUB * 0.20);                                     // 1329
+  var TOTAL = SUB - DISC;                                                // 5316
+  var COUNT = items.reduce(function(s,it){ return s + it[2]; }, 0);      // 7
+
+  function money(c){ return '$' + (c/100).toFixed(2); }
+  function $(id){ return document.getElementById(id); }
+
+  // 廣告牌(兩組視覺相同,只有文字不同)
+  $('sign').innerHTML = '<span class="tag">Special offer</span>' + (manual
+    ? 'Get <b>20% OFF</b> your purchase by entering promo code <span class="code">FRESH20</span> at checkout!'
+    : 'Get <b>20% OFF</b> your purchase, automatically applied at checkout!');
+
+  var html = '';
+  items.forEach(function(it){
+    var qty = it[2] > 1 ? ' <span class="qty">× ' + it[2] + '</span>' : '';
+    html += '<tr><td class="ic">' + ICON[it[0]] + '</td><td>' + it[1] + qty + '</td><td class="p">' + money(it[2]*it[3]) + '</td></tr>';
+  });
+  $('items').innerHTML = html;
+  $('count').textContent = COUNT;
+  $('sub1').textContent = money(SUB);
+  $('sub2').textContent = money(SUB);
+
+  var pages = ['p1','p2','p3','p4'];
+  function show(n){
+    pages.forEach(function(id,i){ $(id).classList.toggle('hidden', i !== n); });
+    $('stepLabel').textContent = n < 3 ? ('Step ' + (n+1) + ' of 3') : '';
+    window.scrollTo(0,0);
+  }
+  function setPrices(withDisc){
+    $('discAmt').textContent = withDisc ? '−' + money(DISC) : money(0);
+    $('total2').textContent  = withDisc ? money(TOTAL) : money(SUB);
+  }
+  function applied(label){
+    $('status').textContent = label;
+    $('status').classList.remove('hidden');
+    $('promoBox').classList.add('hidden');
+    $('to3').disabled = false;
+    setPrices(true);
+  }
+
+  $('to2').onclick = function(){
+    show(1);
+    if (manual){
+      setPrices(false);
+      $('to3').disabled = true;
+      $('promoBox').classList.remove('hidden');
+      setTimeout(function(){ $('codeInput').focus(); }, 50);
+    } else {
+      applied('20% OFF applied automatically');
+    }
+  };
+
+  function tryApply(){
+    var val = $('codeInput').value.trim().toUpperCase();
+    if (val === CODE){ applied('Promo code applied'); }
+    else { $('codeErr').textContent = 'Invalid promo code. Please try again.'; }
+  }
+  $('apply').onclick = tryApply;
+  $('codeInput').addEventListener('keydown', function(e){ if (e.key === 'Enter') tryApply(); });
+  $('codeInput').addEventListener('input', function(){ $('codeErr').textContent = ''; });
+
+  $('to3').onclick = function(){ show(2); };
+
+  // 捐贈選項
+  var amounts = [100, 300, 500];
+  var tiles = $('tiles'), th = '';
+  amounts.forEach(function(a){
+    th += '<button type="button" class="tile" data-v="' + a + '">' + money(a).replace('.00','') + '</button>';
+  });
+  tiles.innerHTML = th;
+  $('finalTotal').textContent = money(TOTAL);
+  function choose(btn, cents){
+    document.querySelectorAll('.tile, .nothanks').forEach(function(b){ b.classList.remove('sel'); });
+    btn.classList.add('sel');
+    $('finalTotal').textContent = money(TOTAL + cents);
+    $('pay').disabled = false;
+  }
+  document.querySelectorAll('.tile').forEach(function(b){
+    b.addEventListener('click', function(){ choose(b, parseInt(b.getAttribute('data-v'), 10)); });
+  });
+  $('nothanks').addEventListener('click', function(){ choose($('nothanks'), 0); });
+  $('pay').onclick = function(){ show(3); };
+
+  // 回到問卷:若網址帶 ?back=<問卷網址> 就直接導向;否則關閉本分頁,回到原本開著的問卷分頁
+  $('back').onclick = function(){
+    var back = q.get('back');
+    if (back){ location.href = back; return; }
+    window.close();
+    setTimeout(function(){ $('hint').classList.remove('hidden'); }, 400);
+  };
+
+  show(0);
+})();
+</script>
+</body>
+</html>
