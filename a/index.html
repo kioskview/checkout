@@ -23,7 +23,7 @@
         box-shadow:0 3px 6px rgba(0,0,0,.18);position:relative;z-index:2}
   .sign .tag{display:block;font-size:.78em;letter-spacing:.1em;text-transform:uppercase;opacity:.8}
   .sign b{font-weight:800}
-  .sign .code{background:#fff;border-radius:4px;padding:0 6px;font-weight:800;letter-spacing:.04em;white-space:nowrap}
+  .sign .code{display:inline-block;background:#fff;color:#c1121f;border:2px dashed #b36b00;border-radius:6px;padding:2px 12px;margin:4px 2px;font-size:1.5em;font-weight:800;letter-spacing:.08em;white-space:nowrap}
 
   /* 機台本體 */
   .cabinet{width:100%;margin-top:-4px;background:linear-gradient(90deg,#e4e7ea 0%,#fbfbfa 12%,#fbfbfa 88%,#e4e7ea 100%);
@@ -115,7 +115,7 @@
     <div class="bezel">
       <div class="camera"></div>
       <div class="screen" id="screen">
-        <div class="topbar"><span>FreshMart Self-Checkout</span><small id="stepLabel"></small></div>
+        <div class="topbar"><span>Self-Checkout</span><small id="stepLabel"></small></div>
 
         <!-- 第 1 頁:掃描完成 -->
         <div class="content" id="p1">
@@ -181,7 +181,7 @@
   var q = new URLSearchParams(location.search);
   var v = (q.get('v') || '').toLowerCase();
   var manual = true;   // 手動輸入組(本檔固定)
-  var CODE = 'FRESH20';
+  var CODE = 'GET20OFF';
 
   // 價格一律以「分」計算,避免浮點誤差
   // 簡單 SVG 圖示(全平台一致)
@@ -189,7 +189,7 @@
     steak:'<svg viewBox="0 0 32 32"><path d="M5 17c0-7 6-12 14-11 6 1 9 6 8 12-1 6-7 9-13 8-6-1-9-3-9-9z" fill="#b5483a"/><path d="M10 17c0-4 4-7 9-6 4 1 6 4 5 8-1 4-5 6-9 5-4-1-5-3-5-7z" fill="#d97b6c"/><circle cx="18" cy="17" r="3" fill="#fff"/></svg>',
     fish:'<svg viewBox="0 0 32 32"><path d="M3 16c4-7 13-9 19-4l7-4v16l-7-4c-6 5-15 3-19-4z" fill="#ef8a6b"/><path d="M9 16c3-3 8-3 11 0-3 3-8 3-11 0z" fill="#f7b49f"/><circle cx="8" cy="15" r="1.4" fill="#222"/></svg>',
     chicken:'<svg viewBox="0 0 32 32"><path d="M14 4c6-1 12 4 11 10-1 5-6 8-10 7l-4 5c-1 1-3 1-3-1l1-5c-3-3-3-9 1-12 1-2 3-3 4-4z" fill="#d9913b"/><circle cx="8" cy="25" r="2.2" fill="#fff"/><circle cx="11" cy="27" r="2.2" fill="#fff"/></svg>',
-    rice:'<svg viewBox="0 0 32 32"><path d="M8 5h16l2 22H6z" fill="#f2efe6" stroke="#b9b29a" stroke-width="1.5"/><rect x="10" y="12" width="12" height="9" rx="2" fill="#1f7a4d"/></svg>',
+    potato:'<svg viewBox="0 0 32 32"><path d="M5 18c0-6 5-11 12-11 6 0 10 4 10 9 0 6-6 10-13 10-5 0-9-3-9-8z" fill="#c9a064"/><circle cx="12" cy="16" r="1.3" fill="#8a6b3a"/><circle cx="19" cy="14" r="1.3" fill="#8a6b3a"/><circle cx="17" cy="21" r="1.3" fill="#8a6b3a"/></svg>',
     oil:'<svg viewBox="0 0 32 32"><rect x="13" y="3" width="6" height="7" rx="1.5" fill="#444"/><path d="M12 10h8l3 6v12a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2V16z" fill="#8a9a2b"/><rect x="11" y="17" width="10" height="7" rx="1.5" fill="#fff" opacity=".85"/></svg>',
     eggs:'<svg viewBox="0 0 32 32"><rect x="3" y="12" width="26" height="14" rx="3" fill="#cfc7b6"/><ellipse cx="9" cy="14" rx="4" ry="5" fill="#fffaf0"/><ellipse cx="16" cy="14" rx="4" ry="5" fill="#fffaf0"/><ellipse cx="23" cy="14" rx="4" ry="5" fill="#fffaf0"/></svg>',
     asparagus:'<svg viewBox="0 0 32 32"><g stroke="#3f8f3a" stroke-width="3.2" stroke-linecap="round"><path d="M9 28L12 8"/><path d="M16 28V6"/><path d="M23 28L20 8"/></g><g fill="#2c6e2a"><ellipse cx="12" cy="7" rx="2.2" ry="4"/><ellipse cx="16" cy="5" rx="2.2" ry="4"/><ellipse cx="20" cy="7" rx="2.2" ry="4"/></g></svg>'
@@ -200,7 +200,7 @@
     ['steak','Ribeye steaks, 2-pack',1,1847],
     ['fish','Atlantic salmon fillet, 1 lb',1,1349],
     ['chicken','Chicken breast, 2.2 lb',1,1043],
-    ['rice','Jasmine rice, 5 lb',1,749],
+    ['potato','Potatoes, 10 lb',1,749],
     ['oil','Extra virgin olive oil, 17 oz',1,879],
     ['eggs','Eggs, 12 ct',2,389]
   ];
@@ -214,7 +214,7 @@
 
   // 廣告牌(兩組視覺相同,只有文字不同)
   $('sign').innerHTML = '<span class="tag">Special offer</span>' + (manual
-    ? 'Get <b>20% OFF</b> your purchase by entering promo code <span class="code">FRESH20</span> at checkout!'
+    ? 'Get <b>20% OFF</b> your purchase by entering promo code <span class="code">GET20OFF</span> at checkout!'
     : 'Get <b>20% OFF</b> your purchase, automatically applied at checkout!');
 
   var html = '';
