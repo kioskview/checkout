@@ -108,6 +108,16 @@
   .slot::after{content:"";position:absolute;left:12%;right:12%;top:8px;height:30px;background:#fff;border:1px solid #c9cdd1;border-top:0}
   .stand{width:34%;height:46px;background:linear-gradient(90deg,#c9ced2,#f1f3f4 50%,#c9ced2);border-left:2px solid var(--edge);border-right:2px solid var(--edge)}
   .base{width:62%;height:16px;background:linear-gradient(#cfd4d8,#aeb4b9);border-radius:6px 6px 12px 12px;box-shadow:0 8px 12px rgba(0,0,0,.2)}
+  /* 按鈕固定在視窗下緣;步驟提示 */
+  .screen{overflow:clip}
+  .content > button.main{position:sticky;bottom:12px;z-index:3;box-shadow:0 0 0 8px #fff}
+  .stepbox{display:inline-flex;align-items:center;gap:10px}
+  .dots{display:inline-flex;gap:7px}
+  .dot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.35);display:inline-block}
+  .dot.on{background:#fff}
+  #stepLabel{font-size:14px;font-weight:700;opacity:1}
+  .conf{font-size:22px;font-weight:700;margin:16px 0;color:#c1121f}
+  .conf b{letter-spacing:.08em}
 </style>
 </head>
 <body>
@@ -117,7 +127,7 @@
     <div class="bezel">
       <div class="camera"></div>
       <div class="screen" id="screen">
-        <div class="topbar"><span>Self-Checkout</span><small id="stepLabel"></small></div>
+        <div class="topbar"><span>Self-Checkout</span><span class="stepbox"><span class="dots" id="dots"></span><small id="stepLabel"></small></span></div>
 
         <!-- 第 1 頁:掃描完成 -->
         <div class="content" id="p1">
@@ -163,6 +173,7 @@
         <div class="content hidden" id="p4">
           <div class="done">
             <h1>Thank you. Your checkout is complete.</h1>
+            <p class="conf">Order confirmation number: <b>1357</b></p>
             <p>Please return to the survey to continue.</p>
             <button class="main back" id="back">Return to the survey</button>
             <p class="hint hidden" id="hint">If this page does not close, please close this tab manually and return to the survey window.</p>
@@ -232,7 +243,9 @@
   var pages = ['p1','p2','p3','p4'];
   function show(n){
     pages.forEach(function(id,i){ $(id).classList.toggle('hidden', i !== n); });
-    $('stepLabel').textContent = n < 3 ? ('Step ' + (n+1) + ' of 3') : '';
+    $('stepLabel').textContent = 'Step ' + (n+1) + ' of 4';
+    var dh = ''; for (var k = 0; k < 4; k++){ dh += '<i class="dot' + (k === n ? ' on' : '') + '"></i>'; }
+    $('dots').innerHTML = dh;
     window.scrollTo(0,0);
   }
   function setPrices(withDisc){
