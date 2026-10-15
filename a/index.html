@@ -24,6 +24,8 @@
   .sign .tag{display:block;font-size:.78em;letter-spacing:.1em;text-transform:uppercase;opacity:.8}
   .sign b{font-weight:800}
   .sign .code{display:inline-block;background:#fff;color:#c1121f;border:2px dashed #b36b00;border-radius:6px;padding:2px 12px;margin:4px 2px;font-size:1.5em;font-weight:800;letter-spacing:.08em;white-space:nowrap}
+  .sign .zero{position:relative;display:inline-block;line-height:1}
+  .sign .zero::after{content:"";position:absolute;left:50%;top:50%;height:.56em;border-left:.09em solid currentColor;transform:translate(-50%,-50%) rotate(30deg)}
 
   /* 機台本體 */
   .cabinet{width:100%;margin-top:-4px;background:linear-gradient(90deg,#e4e7ea 0%,#fbfbfa 12%,#fbfbfa 88%,#e4e7ea 100%);
@@ -149,7 +151,7 @@
 
         <!-- 第 3 頁:捐贈 -->
         <div class="content hidden" id="p3">
-          <p class="ask">Would you like to add a donation to <b>Community Food Bank</b> to help provide meals to families in need?</p>
+          <p class="ask">Would you like to add a donation to <b>Community Food Bank</b> to help provide meals to people in need?</p>
           <div class="tiles" id="tiles"></div>
           <button type="button" class="nothanks" id="nothanks">No, thank you</button>
           <div class="spacer"></div>
@@ -214,7 +216,7 @@
 
   // 廣告牌(兩組視覺相同,只有文字不同)
   $('sign').innerHTML = '<span class="tag">Special offer</span>' + (manual
-    ? 'Get <b>20% OFF</b> your purchase by entering promo code <span class="code">GET20OFF</span> at checkout!'
+    ? 'Get <b>20% OFF</b> your purchase by entering promo code <span class="code">GET2<span class="zero">0</span>OFF</span> at checkout!'
     : 'Get <b>20% OFF</b> your purchase, automatically applied at checkout!');
 
   var html = '';
