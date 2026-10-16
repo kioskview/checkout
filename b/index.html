@@ -18,20 +18,20 @@
   .kiosk{width:100%;max-width:440px;display:flex;flex-direction:column;align-items:center}
 
   /* 廣告牌:貼在機台最上方,不遮擋螢幕 */
-  .sign{width:92%;background:var(--sign);color:var(--signInk);border-radius:12px 12px 4px 4px;padding:10px 14px 11px;
-        text-align:center;border:2px solid #d98e0f;font-weight:600;line-height:1.35;font-size:clamp(14px,3.5vw,17px);
-        box-shadow:0 3px 6px rgba(0,0,0,.18);position:relative;z-index:2}
+  .sign{width:92%;background:var(--sign);color:var(--signInk);border-radius:12px 12px 4px 4px;padding:10px 14px 11px;background-image:linear-gradient(#f8b035,#f19d14);
+        text-align:center;border:2px solid #d98e0f;font-weight:600;line-height:1.35;font-size:clamp(12.5px,3.5vw,17px);
+        box-shadow:0 4px 8px rgba(0,0,0,.25);position:relative;z-index:2}
   .sign .tag{display:block;font-size:.78em;letter-spacing:.1em;text-transform:uppercase;opacity:.8}
   .sign b{font-weight:800}
-  .sign .code{display:inline-block;background:#fff;color:#c1121f;border:2px dashed #b36b00;border-radius:6px;padding:2px 12px;margin:4px 2px;font-size:1.5em;font-weight:800;letter-spacing:.08em;white-space:nowrap}
+  .sign .code{display:inline-block;background:#fff;color:#c1121f;border:2px dashed #b36b00;border-radius:6px;padding:2px 9px;margin:4px 2px;font-size:1.3em;font-weight:800;letter-spacing:.08em;white-space:nowrap}
   .sign .zero{position:relative;display:inline-block;line-height:1}
   .sign .zero::after{content:"";position:absolute;left:50%;top:50%;height:.56em;border-left:.09em solid currentColor;transform:translate(-50%,-50%) rotate(30deg)}
 
   /* 機台本體 */
-  .cabinet{width:100%;margin-top:-4px;background:linear-gradient(90deg,#e4e7ea 0%,#fbfbfa 12%,#fbfbfa 88%,#e4e7ea 100%);
+  .cabinet{width:100%;margin-top:-4px;background:linear-gradient(90deg,#c3c8cc 0%,#f7f7f5 10%,#ffffff 50%,#f1f1ef 90%,#bcc1c5 100%);
            border:2px solid var(--edge);border-radius:26px 26px 14px 14px;padding:26px 16px 0;
            box-shadow:0 10px 24px rgba(0,0,0,.18), inset 0 2px 0 #fff;position:relative}
-  .bezel{background:var(--bezel);border-radius:16px;padding:13px 13px 16px;box-shadow:inset 0 0 0 2px #2b3035, 0 2px 4px rgba(0,0,0,.3)}
+  .bezel{background:linear-gradient(#2d3237,#0e1113);border-radius:16px;padding:13px 13px 16px;box-shadow:inset 0 0 0 2px #2b3035, 0 2px 4px rgba(0,0,0,.3)}
   .screen{background:var(--screen);border-radius:6px;min-height:500px;display:flex;flex-direction:column;overflow:hidden;position:relative}
   .camera{width:8px;height:8px;border-radius:50%;background:#34393e;margin:0 auto 7px;box-shadow:0 0 0 2px #22262a}
 
@@ -77,10 +77,10 @@
   .hint{color:var(--muted);font-size:14px;margin-top:12px}
   /* 第 3 頁:捐贈選項(金額方塊 + 獨立的 No, thank you) */
   .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-  .tile{border:2px solid #b8bec4;background:#f4f6f8;border-radius:12px;padding:22px 0;font-size:24px;font-weight:800;color:var(--ink);cursor:pointer}
+  .tile{border:2px solid #b8bec4;background:#f4f6f8;border-radius:12px;padding:14px 0;font-size:20px;font-weight:800;color:var(--ink);cursor:pointer}
   .tile:hover{border-color:var(--brand)}
   .tile.sel,.nothanks.sel{border-color:var(--brand);background:#e8f5ee;color:var(--brandDark)}
-  .nothanks{width:100%;margin-top:14px;border:2px solid #b8bec4;background:#fff;border-radius:999px;padding:13px;font-size:16px;font-weight:700;color:var(--ink);cursor:pointer}
+  .nothanks{display:block;width:auto;min-width:92px;margin:14px 0 0 auto;border:2px solid #b8bec4;background:#f4f6f8;border-radius:10px;padding:9px 22px;font-size:14px;font-weight:700;color:var(--ink);cursor:pointer}
   .nothanks:hover{border-color:var(--brand)}
   .overlay{position:absolute;inset:0;background:rgba(20,24,28,.55);display:flex;align-items:center;justify-content:center;padding:18px;z-index:5}
   .modal{background:#fff;border-radius:12px;padding:20px;width:100%;max-width:340px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
@@ -108,6 +108,18 @@
   .slot::after{content:"";position:absolute;left:12%;right:12%;top:8px;height:30px;background:#fff;border:1px solid #c9cdd1;border-top:0}
   .stand{width:34%;height:46px;background:linear-gradient(90deg,#c9ced2,#f1f3f4 50%,#c9ced2);border-left:2px solid var(--edge);border-right:2px solid var(--edge)}
   .base{width:62%;height:16px;background:linear-gradient(#cfd4d8,#aeb4b9);border-radius:6px 6px 12px 12px;box-shadow:0 8px 12px rgba(0,0,0,.2)}
+
+  /* 機台外觀(對應情境圖):金屬機身、螢幕反光、下方掃描器與刷卡機 */
+  .devices{display:flex;justify-content:space-between;gap:14px;margin:18px 4px 22px}
+  .scanner{flex:1.4;height:48px;background:linear-gradient(#454c53,#33393f);border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+  .scanner i{display:block;width:100%;height:22px;background:#15181b;border-radius:5px;position:relative}
+  .scanner i::after{content:"";position:absolute;left:8px;right:8px;top:50%;height:3px;margin-top:-1.5px;background:#ff3b30;border-radius:2px;box-shadow:0 0 6px rgba(255,59,48,.7)}
+  .reader{flex:1;height:48px;background:linear-gradient(#454c53,#33393f);border-radius:9px;position:relative;box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+  .reader b{position:absolute;left:12px;right:12px;top:9px;height:9px;background:#15181b;border-radius:3px}
+  .reader b::after{content:"";position:absolute;left:4px;right:4px;top:3px;height:3px;background:#8fd0a8}
+  .reader span{position:absolute;left:22%;right:22%;top:25px;height:17px;background:#e9ecee;border-radius:3px}
+  .reader span::before{content:"";position:absolute;left:0;right:0;top:4px;height:4px;background:#5b6672}
+  .screen::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.07) 0,rgba(255,255,255,.07) 38%,transparent 38%);pointer-events:none;z-index:50}
   /* 按鈕固定在視窗下緣;步驟提示 */
   .screen{overflow:clip}
   .content > button.main{position:sticky;bottom:12px;z-index:3;box-shadow:0 0 0 8px #fff}
@@ -172,7 +184,7 @@
         <!-- 結束 -->
         <div class="content hidden" id="p4">
           <div class="done">
-            <h1>Thank you. Your checkout is complete.</h1>
+            <h1>Thank you.<br><span style="white-space:nowrap">Your checkout is complete.</span></h1>
             <p class="conf">Order confirmation number: <b>1357</b></p>
             <p>Please return to the survey to continue.</p>
             <button class="main back" id="back">Return to the survey</button>
@@ -182,7 +194,7 @@
       </div>
     </div>
 
-    <div style="height:22px"></div>
+    <div class="devices"><div class="scanner"><i></i></div><div class="reader"><b></b><span></span></div></div>
   </div>
   <div class="stand"></div>
   <div class="base"></div>
@@ -227,7 +239,7 @@
 
   // 廣告牌(兩組視覺相同,只有文字不同)
   $('sign').innerHTML = '<span class="tag">Special offer</span>' + (manual
-    ? 'Get <b>20% OFF</b> your purchase by entering promo code <span class="code">GET2<span class="zero">0</span>OFF</span> at checkout!'
+    ? 'Get <b>20% OFF</b> your purchase by entering<br><span style="white-space:nowrap">promo code <span class="code">GET2<span class="zero">0</span>OFF</span> at checkout!</span>'
     : 'Get <b>20% OFF</b> your purchase, automatically applied at checkout!');
 
   var html = '';
