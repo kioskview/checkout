@@ -238,7 +238,7 @@
   function $(id){ return document.getElementById(id); }
 
   // 廣告牌(兩組視覺相同,只有文字不同)
-  $('sign').innerHTML = '<span class="tag">Special offer</span>' + (manual
+  $('sign').innerHTML = (manual
     ? 'Get <b>20% OFF</b> your purchase by entering<br><span style="white-space:nowrap">promo code <span class="code">GET2<span class="zero">0</span>OFF</span> at checkout!</span>'
     : 'Get <b>20% OFF</b> your purchase, automatically applied at checkout!');
 
