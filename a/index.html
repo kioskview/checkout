@@ -120,9 +120,8 @@
   .reader span{position:absolute;left:22%;right:22%;top:25px;height:17px;background:#e9ecee;border-radius:3px}
   .reader span::before{content:"";position:absolute;left:0;right:0;top:4px;height:4px;background:#5b6672}
   .screen::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.07) 0,rgba(255,255,255,.07) 38%,transparent 38%);pointer-events:none;z-index:50}
-  /* 按鈕固定在視窗下緣;步驟提示 */
+  /* 步驟提示(按鈕不再固定在視窗下緣,手機上會蓋住內容) */
   .screen{overflow:clip}
-  .content > button.main{position:sticky;bottom:12px;z-index:3;box-shadow:0 0 0 8px #fff}
   .stepbox{display:inline-flex;align-items:center;gap:10px}
   .dots{display:inline-flex;gap:7px}
   .dot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.35);display:inline-block}
@@ -239,7 +238,7 @@
 
   // 廣告牌(兩組視覺相同,只有文字不同)
   $('sign').innerHTML = (manual
-    ? 'Get <b>20% OFF</b> your purchase by entering<br><span style="white-space:nowrap">promo code <span class="code">GET2<span class="zero">0</span>OFF</span> at checkout!</span>'
+    ? 'Get <b>20% OFF</b> your purchase by entering<br>promo code <span class="code">GET2<span class="zero">0</span>OFF</span> at checkout!'
     : 'Get <b>20% OFF</b> your purchase, automatically applied at checkout!');
 
   var html = '';
