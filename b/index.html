@@ -59,7 +59,6 @@
   .opt{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-radius:10px;padding:12px 14px;margin:8px 0;font-size:17px;cursor:pointer}
   .opt input{width:20px;height:20px;accent-color:var(--brand)}
   .opt.sel{border-color:var(--brand);background:#f0f8f3}
-  .ask{font-size:18px;line-height:1.45;margin:6px 0 18px}
   .qty{color:var(--muted);font-weight:600;margin-left:4px}
   .list{max-height:none}
   /* 第 2 頁:訂單摘要的視覺層級 */
@@ -76,12 +75,6 @@
   .back{width:100%;margin-top:22px}
   .hint{color:var(--muted);font-size:14px;margin-top:12px}
   /* 第 3 頁:捐贈選項(金額方塊 + 獨立的 No, thank you) */
-  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-  .tile{border:2px solid #b8bec4;background:#f4f6f8;border-radius:12px;padding:14px 0;font-size:20px;font-weight:800;color:var(--ink);cursor:pointer}
-  .tile:hover{border-color:var(--brand)}
-  .tile.sel,.nothanks.sel{border-color:var(--brand);background:#e8f5ee;color:var(--brandDark)}
-  .nothanks{display:block;width:auto;min-width:92px;margin:14px 0 0 auto;border:2px solid #b8bec4;background:#f4f6f8;border-radius:10px;padding:9px 22px;font-size:14px;font-weight:700;color:var(--ink);cursor:pointer}
-  .nothanks:hover{border-color:var(--brand)}
   .overlay{position:absolute;inset:0;background:rgba(20,24,28,.55);display:flex;align-items:center;justify-content:center;padding:18px;z-index:5}
   .modal{background:#fff;border-radius:12px;padding:20px;width:100%;max-width:340px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
   .modal h2{margin:0 0 6px;font-size:19px}
@@ -158,7 +151,7 @@
             <div class="row grand"><span>Total to pay</span><span class="amt" id="total2"></span></div>
           </div>
           <div class="spacer"></div>
-          <button class="main" id="to3">Continue to payment</button>
+          <button class="main" id="pay">Complete payment</button>
           <div class="overlay hidden" id="promoBox">
             <div class="modal">
               <h2>Promo code</h2>
@@ -170,18 +163,8 @@
           </div>
         </div>
 
-        <!-- 第 3 頁:捐贈 -->
-        <div class="content hidden" id="p3">
-          <p class="ask">Would you like to add a donation to <b>Community Food Bank</b> to help provide meals to people in need?</p>
-          <div class="tiles" id="tiles"></div>
-          <button type="button" class="nothanks" id="nothanks">No, thank you</button>
-          <div class="spacer"></div>
-          <table class="sum"><tr class="total"><td>Order total</td><td class="p" id="finalTotal"></td></tr></table>
-          <button class="main" id="pay" disabled>Complete payment</button>
-        </div>
-
         <!-- 結束 -->
-        <div class="content hidden" id="p4">
+        <div class="content hidden" id="p3">
           <div class="done">
             <h1>Thank you.<br><span style="white-space:nowrap">Your checkout is complete.</span></h1>
             <p class="conf">Order confirmation number: <b>1357</b></p>
@@ -205,7 +188,7 @@
   var q = new URLSearchParams(location.search);
   var v = (q.get('v') || '').toLowerCase();
   var manual = false;  // 自動套用組(本檔固定)
-  var CODE = 'GET20OFF';
+  var CODE = 'SAVE20K7M';   // 改碼只需改這一行,以及下方 sign 橫幅的字樣
 
   // 價格一律以「分」計算,避免浮點誤差
   // 簡單 SVG 圖示(全平台一致)
@@ -238,7 +221,7 @@
 
   // 廣告牌(兩組視覺相同,只有文字不同)
   $('sign').innerHTML = (manual
-    ? 'Get <b>20% OFF</b> your purchase by entering<br>promo code <span class="code">GET2<span class="zero">0</span>OFF</span> at checkout!'
+    ? 'Get <b>20% OFF</b> your purchase by entering<br>promo code <span class="code">SAVE2<span class="zero">0</span>K7M</span> at checkout!'
     : 'Get <b>20% OFF</b> your purchase, automatically applied at checkout!');
 
   var html = '';
@@ -251,11 +234,11 @@
   $('sub1').textContent = money(SUB);
   $('sub2').textContent = money(SUB);
 
-  var pages = ['p1','p2','p3','p4'];
+  var pages = ['p1','p2','p3'];
   function show(n){
     pages.forEach(function(id,i){ $(id).classList.toggle('hidden', i !== n); });
-    $('stepLabel').textContent = 'Step ' + (n+1) + ' of 4';
-    var dh = ''; for (var k = 0; k < 4; k++){ dh += '<i class="dot' + (k === n ? ' on' : '') + '"></i>'; }
+    $('stepLabel').textContent = 'Step ' + (n+1) + ' of 3';
+    var dh = ''; for (var k = 0; k < 3; k++){ dh += '<i class="dot' + (k === n ? ' on' : '') + '"></i>'; }
     $('dots').innerHTML = dh;
     window.scrollTo(0,0);
   }
@@ -267,7 +250,7 @@
     $('status').textContent = label;
     $('status').classList.remove('hidden');
     $('promoBox').classList.add('hidden');
-    $('to3').disabled = false;
+    $('pay').disabled = false;
     setPrices(true);
   }
 
@@ -275,7 +258,7 @@
     show(1);
     if (manual){
       setPrices(false);
-      $('to3').disabled = true;
+      $('pay').disabled = true;
       $('promoBox').classList.remove('hidden');
       setTimeout(function(){ $('codeInput').focus(); }, 50);
     } else {
@@ -284,7 +267,7 @@
   };
 
   function tryApply(){
-    var val = $('codeInput').value.trim().toUpperCase();
+    var val = $('codeInput').value.replace(/\s+/g, '').toUpperCase();   // 不分大小寫、容忍空格
     if (val === CODE){ applied('Promo code applied'); }
     else { $('codeErr').textContent = 'Invalid promo code. Please try again.'; }
   }
@@ -292,27 +275,7 @@
   $('codeInput').addEventListener('keydown', function(e){ if (e.key === 'Enter') tryApply(); });
   $('codeInput').addEventListener('input', function(){ $('codeErr').textContent = ''; });
 
-  $('to3').onclick = function(){ show(2); };
-
-  // 捐贈選項
-  var amounts = [100, 300, 500];
-  var tiles = $('tiles'), th = '';
-  amounts.forEach(function(a){
-    th += '<button type="button" class="tile" data-v="' + a + '">' + money(a).replace('.00','') + '</button>';
-  });
-  tiles.innerHTML = th;
-  $('finalTotal').textContent = money(TOTAL);
-  function choose(btn, cents){
-    document.querySelectorAll('.tile, .nothanks').forEach(function(b){ b.classList.remove('sel'); });
-    btn.classList.add('sel');
-    $('finalTotal').textContent = money(TOTAL + cents);
-    $('pay').disabled = false;
-  }
-  document.querySelectorAll('.tile').forEach(function(b){
-    b.addEventListener('click', function(){ choose(b, parseInt(b.getAttribute('data-v'), 10)); });
-  });
-  $('nothanks').addEventListener('click', function(){ choose($('nothanks'), 0); });
-  $('pay').onclick = function(){ show(3); };
+  $('pay').onclick = function(){ show(2); };
 
   // 回到問卷:若網址帶 ?back=<問卷網址> 就直接導向;否則關閉本分頁,回到原本開著的問卷分頁
   $('back').onclick = function(){
