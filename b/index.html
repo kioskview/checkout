@@ -122,6 +122,35 @@
   #stepLabel{font-size:14px;font-weight:700;opacity:1}
   .conf{font-size:22px;font-weight:700;margin:16px 0;color:#c1121f}
   .conf b{letter-spacing:.08em}
+
+  /* 手機(窄螢幕):縮小外框與內距,並避免金額、標籤被強制換行 */
+  @media (max-width:430px){
+    body{padding:8px 8px 24px}
+    .cabinet{padding:20px 10px 0;border-radius:22px 22px 12px 12px}
+    .bezel{padding:9px 9px 12px}
+    .topbar{padding:9px 10px;font-size:13.5px;gap:6px}
+    .topbar>span:first-child{white-space:nowrap}
+    .stepbox{gap:7px;white-space:nowrap}
+    .dots{gap:5px}
+    .dot{width:9px;height:9px}
+    #stepLabel{font-size:12.5px}
+    .content{padding:12px 11px 14px}
+    h1{font-size:18px}
+    table{font-size:13.5px}
+    td.ic{width:38px}
+    td.ic svg{width:28px;height:28px}
+    .status{font-size:15px;padding:10px 11px;margin:2px 0 14px}
+    .orderbox{padding:4px 12px}
+    .orderbox .row{gap:8px;white-space:nowrap}
+    .orderbox .row span{white-space:nowrap}
+    .orderbox .muted,.orderbox .disc{font-size:14px}
+    .orderbox .disc em{font-size:11px;padding:2px 5px;margin-left:4px}
+    .orderbox .grand span:first-child{font-size:16px}
+    .orderbox .grand .amt{font-size:21px}
+    button.main{font-size:17px;padding:14px}
+    .overlay{padding:12px}
+    .modal{padding:16px}
+  }
 </style>
 </head>
 <body>
