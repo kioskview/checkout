@@ -73,7 +73,7 @@
   .orderbox .grand span:first-child{font-size:17px;font-weight:700}
   .orderbox .grand .amt{font-size:24px;font-weight:800}
   .back{width:100%;margin-top:22px}
-  .hint{color:var(--ink);font-size:14px;line-height:1.5;margin-top:12px}
+  .hint{color:var(--muted);font-size:14px;margin-top:12px}
   /* 第 3 頁:捐贈選項(金額方塊 + 獨立的 No, thank you) */
   .overlay{position:absolute;inset:0;background:rgba(20,24,28,.55);display:flex;align-items:center;justify-content:center;padding:18px;z-index:5}
   .modal{background:#fff;border-radius:12px;padding:20px;width:100%;max-width:340px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
@@ -170,7 +170,7 @@
             <p class="conf">Order confirmation number: <b>1357</b></p>
             <p>Please return to the survey to continue.</p>
             <button class="main back" id="back">Return to the survey</button>
-            <p class="hint hidden" id="hint">There is no previous page to return to. Please go back to the survey yourself (use your browser's Back button, or switch to the survey tab or window).</p>
+            <p class="hint hidden" id="hint">If this page does not close, please close this tab manually and return to the survey window.</p>
           </div>
         </div>
       </div>
@@ -277,13 +277,12 @@
 
   $('pay').onclick = function(){ show(2); };
 
-  // 回到問卷:若網址帶 ?back=<問卷網址> 就直接導向;否則返回上一頁(問卷必須是在同一個分頁開啟本頁)。不再嘗試關閉分頁
+  // 回到問卷:若網址帶 ?back=<問卷網址> 就直接導向;否則關閉本分頁,回到原本開著的問卷分頁
   $('back').onclick = function(){
     var back = q.get('back');
     if (back){ location.href = back; return; }
-    if (history.length > 1){ history.back(); }            // 本頁是從問卷「同一個分頁」開啟的:直接回到問卷
-    // 返回成功時頁面會離開,以下不會執行;若 0.7 秒後本頁還在(沒有上一頁可回),就顯示提示
-    setTimeout(function(){ $('hint').classList.remove('hidden'); }, history.length > 1 ? 700 : 0);
+    window.close();
+    setTimeout(function(){ $('hint').classList.remove('hidden'); }, 400);
   };
 
   show(0);
